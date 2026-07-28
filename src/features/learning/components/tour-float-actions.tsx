@@ -16,8 +16,19 @@ export function TourFloatActions() {
 
   const config = getTourByPageKey(pageKey);
 
-  // Wait for persist rehydrate; hide during active tour / summary / quiz
-  if (!hasHydrated || phase === "active" || phase === "summary" || phase === "quiz" || !pageKey || !config) return null;
+  // Wait for persist rehydrate; hide during active tour / summary / quiz / pickers
+  if (
+    !hasHydrated ||
+    phase === "active" ||
+    phase === "summary" ||
+    phase === "quiz" ||
+    phase === "mode-picker" ||
+    phase === "path-picker" ||
+    phase === "scenario-picker" ||
+    !pageKey ||
+    !config
+  )
+    return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-[10060] animate-fade-in">

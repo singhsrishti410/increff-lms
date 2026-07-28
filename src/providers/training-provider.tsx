@@ -7,7 +7,8 @@ import { useKeyboard } from "@/features/learning/hooks/use-keyboard";
 import { useCheckpointStore } from "@/shared/stores/checkpoint-store";
 import { useTrainingStore } from "@/features/learning/stores/training-store";
 import { AUTO_CONTINUE_KEY, START_TOUR_PARAM, getTourByPageKey, getTourByPathname } from "@/shared/lib/tour-registry";
-import type { TourConfig, Scenario } from "@/features/learning/types";
+import { CHOOSE_PATH_PARAM } from "@/shared/lib/learning-path";
+import type { TourConfig, Scenario, PathGroupId } from "@/features/learning/types";
 
 interface TrainingContextType {
   startTraining: (config: TourConfig) => void;
@@ -160,13 +161,15 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
     tryAuto();
   }, [pathname, continueFromCheckpoint]);
 
-  // Navbar / learning-path: ?startTour=1 opens the mode picker for this module
+  // Navbar / learning-path: ?startTour=1 opens mode picker (or path picker if choosePath set)
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (searchParams.get(START_TOUR_PARAM) !== "1") return;
 
+    const choosePath = searchParams.get(CHOOSE_PATH_PARAM) as PathGroupId | null;
     const url = new URL(window.location.href);
     url.searchParams.delete(START_TOUR_PARAM);
+    url.searchParams.delete(CHOOSE_PATH_PARAM);
     const clean = url.pathname + (url.searchParams.toString() ? `?${url.searchParams}` : "");
     window.history.replaceState({}, "", clean);
 
@@ -174,14 +177,23 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
     if (sessionStorage.getItem(AUTO_CONTINUE_KEY)) return;
     if (sessionStorage.getItem("wmsTrainingResume")) return;
     if (sessionStorage.getItem("wmsB2cPickResume")) return;
+    if (sessionStorage.getItem("wmsB2cPackResume")) return;
 
     const phase = useTrainingStore.getState().phase;
-    if (phase === "active" || phase === "summary" || phase === "quiz") return;
+    if (phase === "active" || phase === "summary" || phase === "quiz" || phase === "path-picker") return;
+
+    useCheckpointStore.getState().clear();
+
+    if (choosePath === "picking" || choosePath === "packing") {
+      const t = window.setTimeout(() => {
+        useTrainingStore.getState().openPathPicker(choosePath);
+      }, 180);
+      return () => window.clearTimeout(t);
+    }
 
     const config = getTourByPathname(pathname);
     if (!config) return;
 
-    useCheckpointStore.getState().clear();
     const t = window.setTimeout(() => {
       useTrainingStore.getState().openModePicker(config);
     }, 180);

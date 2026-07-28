@@ -10,9 +10,16 @@ import { useTrainingStore } from "@/features/learning/stores/training-store";
 import { useCheckpointStore } from "@/shared/stores/checkpoint-store";
 import { useTraining } from "@/features/learning/hooks/use-training";
 import { ModePicker } from "@/features/learning/components/mode-picker";
+import { PathPicker } from "@/features/learning/components/path-picker";
 import { ScenarioPicker } from "@/features/learning/components/scenario-picker";
 import { SummaryOverlay } from "@/features/learning/components/summary-overlay";
 import { Quiz } from "@/features/learning/components/quiz";
+import {
+  continueLabelFor,
+  continueLearningHref,
+  getLearningNext,
+  pathOptionStartHref,
+} from "@/shared/lib/learning-path";
 
 /** Product shell — same structure as original wms/*.html (no custom sidebar). */
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +35,25 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const store = useTrainingStore();
   const training = useTraining();
-  const { phase, config } = store;
+  const { phase, config, pathGroup } = store;
+
+  const handleContinueLearning = () => {
+    const next = getLearningNext(config?.pageKey);
+    training.skipQuiz();
+
+    if (!next || next.type === "dashboard") {
+      window.location.href = config?.homeHref || "/";
+      return;
+    }
+
+    if (next.type === "path-group") {
+      // Stay on page and ask which sub-module to learn next
+      store.openPathPicker(next.group);
+      return;
+    }
+
+    window.location.href = continueLearningHref(next);
+  };
 
   return (
     <div className="product-app min-h-screen bg-[var(--bg)]" style={{ paddingTop: 48 }}>
@@ -37,6 +62,17 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {children}
 
       <TrainingPanel />
+
+      {phase === "path-picker" && pathGroup && (
+        <PathPicker
+          group={pathGroup}
+          onSelect={(option) => {
+            store.reset();
+            window.location.href = pathOptionStartHref(option);
+          }}
+          onCancel={() => store.reset()}
+        />
+      )}
 
       {phase === "mode-picker" && config && (
         <ModePicker
@@ -64,26 +100,23 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {phase === "summary" && config && (
         <SummaryOverlay
           config={config}
+          continueLabel={continueLabelFor(config)}
           onStartOver={() => {
             useCheckpointStore.getState().clear();
             const pageKey = config.learningPageKey || config.pageKey;
             const href = config.learningModuleHref || config.pageHref || "/";
-            // Prefer restarting from the module's first page (e.g. gate-entry list)
             if (typeof window !== "undefined" && window.location.pathname !== href && config.learningModuleHref) {
               sessionStorage.setItem("increff-tour-auto-continue", "start-over");
               sessionStorage.setItem(
                 "increff-start-over-boot",
-                JSON.stringify({ pageKey, mode: store.mode || "practice" })
+                JSON.stringify({ pageKey, mode: store.mode || "watch" })
               );
               window.location.href = href;
               return;
             }
             store.openModePicker(config);
           }}
-          onContinueLearning={() => {
-            training.skipQuiz(); // marks complete, then go learning path
-            window.location.href = config.homeHref || "/";
-          }}
+          onContinueLearning={handleContinueLearning}
           onTakeQuiz={() => store.showQuiz()}
         />
       )}

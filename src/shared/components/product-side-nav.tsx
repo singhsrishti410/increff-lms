@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MODULES } from "@/shared/lib/curriculum";
 import { withStartTour } from "@/shared/lib/tour-registry";
+import { withChoosePath } from "@/shared/lib/learning-path";
 
 interface ProductSideNavProps {
   open: boolean;
@@ -17,6 +18,10 @@ export function ProductSideNav({ open, onClose }: ProductSideNavProps) {
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
+
+  const earlyWms = wmsMods.filter((m) => m.number <= 4);
+  const pickingMods = wmsMods.filter((m) => m.number === 5 || m.number === 6);
+  const packingMods = wmsMods.filter((m) => m.number >= 7 && m.number <= 9);
 
   return (
     <aside className={`product-side-nav${open ? " open" : ""}`} aria-hidden={!open}>
@@ -32,11 +37,63 @@ export function ProductSideNav({ open, onClose }: ProductSideNavProps) {
       <nav className="product-side-nav-body">
         <div className="product-side-nav-section">
           <div className="product-side-nav-label">WMS</div>
-          {wmsMods.map((mod) => (
+          {earlyWms.map((mod) => (
             <Link
               key={mod.id}
               href={withStartTour(mod.href)}
               className={`product-side-nav-link${isActive(mod.href) ? " active" : ""}`}
+              onClick={onClose}
+            >
+              <span className="product-side-nav-num">{mod.number}</span>
+              {mod.title}
+            </Link>
+          ))}
+
+          <Link
+            href={withChoosePath("/wms/pick-pending", "picking")}
+            className={`product-side-nav-link${
+              pathname.startsWith("/wms/pick-") ? " active" : ""
+            }`}
+            onClick={onClose}
+          >
+            <span className="product-side-nav-num">5</span>
+            B2C Picking
+          </Link>
+          {pickingMods.map((mod) => (
+            <Link
+              key={mod.id}
+              href={withStartTour(mod.href)}
+              className={`product-side-nav-link product-side-nav-link-sub${
+                isActive(mod.href) ? " active" : ""
+              }`}
+              onClick={onClose}
+            >
+              <span className="product-side-nav-num">{mod.number}</span>
+              {mod.title}
+            </Link>
+          ))}
+
+          <Link
+            href={withChoosePath("/wms/packing", "packing")}
+            className={`product-side-nav-link${
+              pathname === "/wms/packing" ||
+              pathname.startsWith("/wms/manifests") ||
+              pathname.startsWith("/wms/handover")
+                ? " active"
+                : ""
+            }`}
+            onClick={onClose}
+          >
+            <span className="product-side-nav-num">7</span>
+            B2C Packing
+          </Link>
+          {packingMods.map((mod) => (
+            <Link
+              key={mod.id}
+              href={withStartTour(mod.href)}
+              className={`product-side-nav-link product-side-nav-link-sub${
+                isActive(mod.href) ? " active" : ""
+              }`}
               onClick={onClose}
             >
               <span className="product-side-nav-num">{mod.number}</span>

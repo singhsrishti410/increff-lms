@@ -6,6 +6,7 @@ import { getSupport } from "@/shared/lib/curriculum";
 
 interface SummaryOverlayProps {
   config: TourConfig;
+  continueLabel?: string;
   onContinueLearning: () => void;
   onStartOver: () => void;
   onTakeQuiz: () => void;
@@ -13,6 +14,7 @@ interface SummaryOverlayProps {
 
 export function SummaryOverlay({
   config,
+  continueLabel = "Continue learning",
   onContinueLearning,
   onStartOver,
   onTakeQuiz,
@@ -46,7 +48,7 @@ export function SummaryOverlay({
             onClick={onContinueLearning}
             className="h-10 px-2 rounded-xl bg-[#9fe870] text-[#0e0f0c] text-xs font-semibold hover:bg-[#cdffad] transition-all duration-150"
           >
-            Continue learning
+            {continueLabel}
           </button>
           <button
             type="button"

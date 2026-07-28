@@ -2,18 +2,20 @@ import type { TourConfig } from "@/features/learning/types";
 import { getModule } from "@/shared/lib/curriculum";
 
 const HOME = "/";
-const mod = getModule("wms-b2c-packing")!;
+const packingMod = getModule("wms-packing")!;
+const manifestMod = getModule("wms-manifest")!;
+const handoverMod = getModule("wms-handover")!;
 const PACK_RESUME = "wmsB2cPackResume";
 
 export const PackingTour: TourConfig = {
-  moduleId: "wms-b2c-packing",
+  moduleId: "wms-packing",
   pageKey: "wms-packing",
   pageHref: "/wms/packing",
   parentModuleName: "Piece Packing",
   track: "WMS",
-  number: mod.number,
-  title: mod.title,
-  skills: mod.skills,
+  number: packingMod.number,
+  title: packingMod.title,
+  skills: packingMod.skills,
   homeHref: HOME,
   glossaryKeys: ["AWB", "Manifest", "Handover", "Channel"],
   pitfalls: ["Clicking Complete Packing before all items are scanned", "Forgetting to scan AWB after printing the label", "Packing expired / QC-fail items"],
@@ -39,14 +41,14 @@ export const PackingTour: TourConfig = {
 };
 
 export const ManifestTour: TourConfig = {
-  moduleId: "wms-b2c-packing",
+  moduleId: "wms-manifest",
   pageKey: "wms-manifest",
   pageHref: "/wms/manifests",
   parentModuleName: "Manifests",
   track: "WMS",
-  number: mod.number,
-  title: mod.title,
-  skills: mod.skills,
+  number: manifestMod.number,
+  title: manifestMod.title,
+  skills: manifestMod.skills,
   homeHref: HOME,
   glossaryKeys: ["Manifest", "AWB", "Channel"],
   pitfalls: ["Closing manifest before scanning all AWBs", "Selecting wrong transporter"],
@@ -66,14 +68,14 @@ export const ManifestTour: TourConfig = {
 };
 
 export const HandoverTour: TourConfig = {
-  moduleId: "wms-b2c-packing",
+  moduleId: "wms-handover",
   pageKey: "wms-handover",
   pageHref: "/wms/handover",
   parentModuleName: "Piece Order Handover",
   track: "WMS",
-  number: mod.number,
-  title: mod.title,
-  skills: mod.skills,
+  number: handoverMod.number,
+  title: handoverMod.title,
+  skills: handoverMod.skills,
   homeHref: HOME,
   glossaryKeys: ["Handover", "AWB"],
   pitfalls: ["Confirming handover with rejected AWBs still listed", "Handing over before manifest is closed"],

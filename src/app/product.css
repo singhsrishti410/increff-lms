@@ -2677,3 +2677,7 @@ body:has(.product-side-nav.open) .product-page-body {
   background: #dbeafe;
   color: #1d4ed8;
 }
+.product-side-nav-link-sub {
+  padding-left: 22px;
+  font-size: 12px;
+}

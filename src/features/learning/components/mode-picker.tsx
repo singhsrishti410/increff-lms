@@ -23,6 +23,9 @@ export function ModePicker({ config, onContinue, onCancel }: ModePickerProps) {
           </span>
           <h2 className="text-2xl font-extrabold text-[#0e0f0c] tracking-tight mb-1">How do you want to learn?</h2>
           <p className="text-sm text-[#6b6d6a]">Watch for first exposure. Practice to try it yourself.</p>
+          {config.parentModuleName && (
+            <p className="text-xs font-semibold text-[#1a73e8] mt-2">{config.parentModuleName}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-6">

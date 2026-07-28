@@ -2,18 +2,19 @@ import type { TourConfig } from "@/features/learning/types";
 import { getModule } from "@/shared/lib/curriculum";
 
 const HOME = "/";
-const mod = getModule("wms-b2c-picking")!;
+const pendingMod = getModule("wms-pick-pending")!;
+const itemMod = getModule("wms-pick-item")!;
 const PICK_RESUME = "wmsB2cPickResume";
 
 export const PickPendingTour: TourConfig = {
-  moduleId: "wms-b2c-picking",
+  moduleId: "wms-pick-pending",
   pageKey: "wms-pick-pending",
   pageHref: "/wms/pick-pending",
   parentModuleName: "Piece Pick Pending",
   track: "WMS",
-  number: mod.number,
-  title: mod.title,
-  skills: mod.skills,
+  number: pendingMod.number,
+  title: pendingMod.title,
+  skills: pendingMod.skills,
   homeHref: HOME,
   glossaryKeys: ["Piece Pick", "Express Picking", "SLA"],
   pitfalls: ["Ignoring oldest pick lists / present-day SLA", "Assigning pickers without checking zone pendency", "Mixing Express and Default without checking Pick Type"],
@@ -39,14 +40,14 @@ export const PickPendingTour: TourConfig = {
 };
 
 export const PickItemTour: TourConfig = {
-  moduleId: "wms-b2c-picking",
+  moduleId: "wms-pick-item",
   pageKey: "wms-pick-item",
   pageHref: "/wms/pick-item",
   parentModuleName: "Piece Pick Item",
   track: "WMS",
-  number: mod.number,
-  title: mod.title,
-  skills: mod.skills,
+  number: itemMod.number,
+  title: itemMod.title,
+  skills: itemMod.skills,
   homeHref: HOME,
   glossaryKeys: ["Piece Pick", "Express Picking"],
   pitfalls: ["Wrong Express toggle vs released wave", "Scanning wrong SKU or wrong bin", "Marking Not Found without supervisor check"],

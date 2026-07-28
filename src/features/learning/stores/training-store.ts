@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { TourConfig, Scenario, TrainingMode, TrainingPhase } from "@/features/learning/types";
+import type { TourConfig, Scenario, TrainingMode, TrainingPhase, PathGroupId } from "@/features/learning/types";
 
 interface TrainingState {
   phase: TrainingPhase;
@@ -8,7 +8,9 @@ interface TrainingState {
   selectedScenario: Scenario | null;
   currentStepIndex: number;
   isStarted: boolean;
+  pathGroup: PathGroupId | null;
   openModePicker: (config: TourConfig) => void;
+  openPathPicker: (group: PathGroupId) => void;
   loadConfig: (config: TourConfig) => void;
   setMode: (mode: TrainingMode) => void;
   selectScenario: (scenario: Scenario) => void;
@@ -30,9 +32,12 @@ export const useTrainingStore = create<TrainingState>()((set, get) => ({
   selectedScenario: null,
   currentStepIndex: 0,
   isStarted: false,
+  pathGroup: null,
 
   openModePicker: (config) =>
-    set({ config, phase: "mode-picker", mode: "watch", isStarted: true }),
+    set({ config, phase: "mode-picker", mode: "watch", pathGroup: null, isStarted: true }),
+  openPathPicker: (group) =>
+    set({ phase: "path-picker", pathGroup: group, config: null, isStarted: true }),
   loadConfig: (config) => set({ config, isStarted: true }),
   setMode: (mode) => set({ mode }),
   selectScenario: (scenario) => set({ selectedScenario: scenario }),
@@ -51,7 +56,14 @@ export const useTrainingStore = create<TrainingState>()((set, get) => ({
   showSummary: () => set({ phase: "summary" }),
   showQuiz: () => set({ phase: "quiz" }),
   finish: () =>
-    set({ phase: "idle", config: null, selectedScenario: null, currentStepIndex: 0, isStarted: false }),
+    set({
+      phase: "idle",
+      config: null,
+      selectedScenario: null,
+      currentStepIndex: 0,
+      isStarted: false,
+      pathGroup: null,
+    }),
   reset: () =>
     set({
       phase: "idle",
@@ -60,5 +72,6 @@ export const useTrainingStore = create<TrainingState>()((set, get) => ({
       selectedScenario: null,
       currentStepIndex: 0,
       isStarted: false,
+      pathGroup: null,
     }),
 }));
