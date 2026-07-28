@@ -1,34 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { HandoverTour } from "@/features/wms/b2c/packing/tour-config";
-import { useTrainingStore } from "@/features/learning/stores/training-store";
-import { useTraining } from "@/features/learning/hooks/use-training";
 
 export default function HandoverPage() {
   const { startTraining } = useTrainingContext();
-  const { beginTour } = useTraining();
   const [mode, setMode] = useState("manifest");
-
-  useEffect(() => {
-    const raw = sessionStorage.getItem("wmsB2cPackResume");
-    if (raw) {
-      try {
-        const meta = JSON.parse(raw);
-        sessionStorage.removeItem("wmsB2cPackResume");
-        if (meta?.resume) {
-          const store = useTrainingStore.getState();
-          store.setMode(meta.mode || "practice");
-          store.selectScenario(meta.scenario || HandoverTour.scenarios[0]);
-          store.beginTour();
-          setTimeout(() => beginTour(0), 100);
-        }
-      } catch {}
-    }
-  }, [beginTour]);
 
   return (
     <>

@@ -1,35 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState } from "react";
 import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { ManifestTour } from "@/features/wms/b2c/packing/tour-config";
-import { useTrainingStore } from "@/features/learning/stores/training-store";
-import { useTraining } from "@/features/learning/hooks/use-training";
-import { useState } from "react";
+import { withStartTour } from "@/shared/lib/tour-registry";
 
 export default function ManifestsPage() {
   const { startTraining } = useTrainingContext();
-  const { beginTour } = useTraining();
   const [tab, setTab] = useState("create");
-
-  useEffect(() => {
-    const raw = sessionStorage.getItem("wmsB2cPackResume");
-    if (raw) {
-      try {
-        const meta = JSON.parse(raw);
-        sessionStorage.removeItem("wmsB2cPackResume");
-        if (meta?.resume) {
-          const store = useTrainingStore.getState();
-          store.setMode(meta.mode || "practice");
-          store.selectScenario(meta.scenario || ManifestTour.scenarios[0]);
-          store.beginTour();
-          setTimeout(() => beginTour(0), 100);
-        }
-      } catch {}
-    }
-  }, [beginTour]);
 
   return (
     <>
@@ -100,7 +80,7 @@ export default function ManifestsPage() {
               </div>
 
               <div className="mt-4">
-                <a id="mf-link-handover" href="/wms/handover" className="btn btn-blue">Next: Handover</a>
+                <a id="mf-link-handover" href={withStartTour("/wms/handover")} className="btn btn-blue">Next: Handover</a>
               </div>
             </div>
           )}

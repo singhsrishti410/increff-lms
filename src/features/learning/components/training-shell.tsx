@@ -35,6 +35,10 @@ function TrainingShellInner({ children }: { children: React.ReactNode }) {
 
   const handleModeContinue = (selectedMode: "watch" | "practice") => {
     store.setMode(selectedMode);
+    if (config!.scenarios.length > 1) {
+      store.openScenarioPicker();
+      return;
+    }
     store.selectScenario(config!.scenarios[0]);
     store.beginTour();
     setTimeout(() => beginTour(0), 100);

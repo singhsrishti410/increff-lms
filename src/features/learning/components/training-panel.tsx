@@ -3,6 +3,7 @@
 import React from "react";
 import { useTrainingStore } from "@/features/learning/stores/training-store";
 import { useTraining } from "@/features/learning/hooks/use-training";
+import { activeTourSteps } from "@/shared/lib/tour-utils";
 
 export function TrainingPanel() {
   const { phase, config, currentStepIndex, mode, selectedScenario } = useTrainingStore();
@@ -10,9 +11,10 @@ export function TrainingPanel() {
 
   if (phase !== "active" || !config) return null;
 
-  const step = config.steps[currentStepIndex];
-  const total = config.steps.length;
-  const pct = Math.max(8, Math.round(((currentStepIndex + 1) / total) * 100));
+  const steps = activeTourSteps(config, selectedScenario?.id);
+  const step = steps[currentStepIndex];
+  const total = steps.length;
+  const pct = Math.max(8, Math.round(((currentStepIndex + 1) / Math.max(total, 1)) * 100));
   const currentSkillIndex = step?.skillIndex ?? 1;
   const story = selectedScenario?.story || config.scenarios[0]?.story || "";
 
@@ -34,7 +36,7 @@ export function TrainingPanel() {
 
         <div>
           <div className="progress-line" id="tp-progress-text">
-            Step {currentStepIndex + 1} of {total} · {Math.round(((currentStepIndex + 1) / total) * 100)}% complete
+            Step {currentStepIndex + 1} of {total} · {Math.round(((currentStepIndex + 1) / Math.max(total, 1)) * 100)}% complete
           </div>
           <div className="progress-bar">
             <span id="tp-progress-bar" style={{ width: `${pct}%` }} />
@@ -44,24 +46,22 @@ export function TrainingPanel() {
               <i
                 key={i}
                 className={i < currentStepIndex ? "done" : i === currentStepIndex ? "current" : ""}
-                title={config.steps[i]?.title || `Step ${i + 1}`}
+                title={steps[i]?.title || `Step ${i + 1}`}
               />
             ))}
           </div>
         </div>
 
-        {/* Current step callout */}
         <div className="current-step-card">
           <div className="current-step-label">Now on</div>
           <div className="current-step-title">{step?.title || "—"}</div>
           {step?.skillLabel && <div className="current-step-skill">{step.skillLabel}</div>}
         </div>
 
-        {/* Step list so you can see where you are */}
         <div>
           <div className="panel-section-label">Steps</div>
           <ul className="step-list">
-            {config.steps.map((s, i) => {
+            {steps.map((s, i) => {
               const done = i < currentStepIndex;
               const current = i === currentStepIndex;
               return (

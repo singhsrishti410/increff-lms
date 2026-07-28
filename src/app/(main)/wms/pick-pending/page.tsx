@@ -4,6 +4,7 @@ import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { PickPendingTour } from "@/features/wms/b2c/picking/tour-config";
+import { withStartTour } from "@/shared/lib/tour-registry";
 
 export default function PickPendingPage() {
   const { startTraining } = useTrainingContext();
@@ -74,7 +75,7 @@ export default function PickPendingPage() {
             </span>
             <a
               id="ppp-link-pick"
-              href="/wms/pick-item"
+              href={withStartTour("/wms/pick-item")}
               className="btn btn-blue block mt-3 w-full no-underline"
             >
               Start picking

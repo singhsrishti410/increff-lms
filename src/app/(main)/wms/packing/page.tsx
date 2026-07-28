@@ -4,6 +4,7 @@ import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { PackingTour } from "@/features/wms/b2c/packing/tour-config";
+import { withStartTour } from "@/shared/lib/tour-registry";
 
 export default function PackingPage() {
   const { startTraining } = useTrainingContext();
@@ -44,7 +45,7 @@ export default function PackingPage() {
           </div>
 
           <div className="mt-4">
-            <a id="pack-link-manifest" href="/wms/manifests" className="btn btn-blue">Next: Manifest</a>
+            <a id="pack-link-manifest" href={withStartTour("/wms/manifests")} className="btn btn-blue">Next: Manifest</a>
           </div>
         </div>
       </div>

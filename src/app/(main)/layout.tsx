@@ -79,6 +79,10 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
           config={config}
           onContinue={(mode) => {
             store.setMode(mode);
+            if (config.scenarios.length > 1) {
+              store.openScenarioPicker();
+              return;
+            }
             store.selectScenario(config.scenarios[0]);
             store.beginTour();
             setTimeout(() => training.beginTour(0), 100);

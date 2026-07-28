@@ -4,6 +4,7 @@ import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { GrnTour } from "@/features/wms/inward/grn/tour-config";
+import { withStartTour } from "@/shared/lib/tour-registry";
 
 export default function GrnPage() {
   const { startTraining } = useTrainingContext();
@@ -57,7 +58,7 @@ export default function GrnPage() {
               </div>
               <div id="grn-print-actions" className="flex gap-2 mb-4">
                 <button id="grn-btn-print-pass" className="h-8 px-4 rounded border border-green-600 bg-white text-green-600 text-xs font-semibold hover:bg-green-50">Print QC Pass Bin ID</button>
-                <button className="h-8 px-4 rounded border border-red-400 bg-white text-red-500 text-xs font-semibold hover:bg-red-50">Print QC Fail Bin ID</button>
+                <button id="grn-btn-print-fail" className="h-8 px-4 rounded border border-red-400 bg-white text-red-500 text-xs font-semibold hover:bg-red-50">Print QC Fail Bin ID</button>
               </div>
               <div className="flex flex-col gap-1 mb-4">
                 <label className="text-xs font-semibold text-slate-700">Scan QC Bin ID *</label>
@@ -65,7 +66,7 @@ export default function GrnPage() {
               </div>
               <div>
                 <button id="grn-btn-complete" className="h-8 px-4 rounded bg-green-600 text-white text-xs font-semibold hover:bg-green-700">Complete Item GRN</button>
-                <a href="/wms/putaway" className="btn btn-blue ml-2">Next: Put Away</a>
+                <a href={withStartTour("/wms/putaway")} className="btn btn-blue ml-2">Next: Put Away</a>
               </div>
             </div>
           </div>

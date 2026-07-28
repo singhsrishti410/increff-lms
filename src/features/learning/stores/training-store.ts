@@ -11,6 +11,7 @@ interface TrainingState {
   pathGroup: PathGroupId | null;
   openModePicker: (config: TourConfig) => void;
   openPathPicker: (group: PathGroupId) => void;
+  openScenarioPicker: () => void;
   loadConfig: (config: TourConfig) => void;
   setMode: (mode: TrainingMode) => void;
   selectScenario: (scenario: Scenario) => void;
@@ -38,15 +39,19 @@ export const useTrainingStore = create<TrainingState>()((set, get) => ({
     set({ config, phase: "mode-picker", mode: "watch", pathGroup: null, isStarted: true }),
   openPathPicker: (group) =>
     set({ phase: "path-picker", pathGroup: group, config: null, isStarted: true }),
+  openScenarioPicker: () => set({ phase: "scenario-picker" }),
   loadConfig: (config) => set({ config, isStarted: true }),
   setMode: (mode) => set({ mode }),
   selectScenario: (scenario) => set({ selectedScenario: scenario }),
   beginTour: (startIndex = 0) => set({ phase: "active", currentStepIndex: startIndex, isStarted: true }),
   setStepIndex: (index) => set({ currentStepIndex: index }),
   advanceStep: () => {
-    const { config, currentStepIndex } = get();
+    const { config, currentStepIndex, selectedScenario } = get();
     if (!config) return;
-    if (currentStepIndex + 1 < config.steps.length) {
+    const total = selectedScenario
+      ? config.steps.filter((s) => !s.scenarioIds?.length || s.scenarioIds.includes(selectedScenario.id)).length
+      : config.steps.length;
+    if (currentStepIndex + 1 < total) {
       set({ currentStepIndex: currentStepIndex + 1 });
     }
   },

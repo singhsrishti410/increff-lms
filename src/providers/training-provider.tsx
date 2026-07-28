@@ -161,26 +161,51 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
     tryAuto();
   }, [pathname, continueFromCheckpoint]);
 
-  // Navbar / learning-path: ?startTour=1 opens mode picker (or path picker if choosePath set)
+  // Every module page entry: always show Watch/Practice (or path picker when choosePath is set)
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (searchParams.get(START_TOUR_PARAM) !== "1") return;
+
+    const config = getTourByPathname(pathname);
+    if (!config) return;
 
     const choosePath = searchParams.get(CHOOSE_PATH_PARAM) as PathGroupId | null;
-    const url = new URL(window.location.href);
-    url.searchParams.delete(START_TOUR_PARAM);
-    url.searchParams.delete(CHOOSE_PATH_PARAM);
-    const clean = url.pathname + (url.searchParams.toString() ? `?${url.searchParams}` : "");
-    window.history.replaceState({}, "", clean);
+    const hasStartTour = searchParams.get(START_TOUR_PARAM) === "1";
 
-    // Don't interrupt an in-progress tour or resume handoff
-    if (sessionStorage.getItem(AUTO_CONTINUE_KEY)) return;
-    if (sessionStorage.getItem("wmsTrainingResume")) return;
-    if (sessionStorage.getItem("wmsB2cPickResume")) return;
-    if (sessionStorage.getItem("wmsB2cPackResume")) return;
+    // Clean tour query params from the URL when present
+    if (hasStartTour || choosePath) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete(START_TOUR_PARAM);
+      url.searchParams.delete(CHOOSE_PATH_PARAM);
+      const clean = url.pathname + (url.searchParams.toString() ? `?${url.searchParams}` : "");
+      window.history.replaceState({}, "", clean);
+    }
 
-    const phase = useTrainingStore.getState().phase;
-    if (phase === "active" || phase === "summary" || phase === "quiz" || phase === "path-picker") return;
+    // Only skip for true mid-step checkpoint handoff (Continue demo)
+    if (sessionStorage.getItem(AUTO_CONTINUE_KEY) === "1") return;
+
+    // Stale chain keys used to block the picker — clear them so every land shows it
+    sessionStorage.removeItem("wmsTrainingResume");
+    sessionStorage.removeItem("wmsB2cPickResume");
+    sessionStorage.removeItem("wmsB2cPackResume");
+
+    const state = useTrainingStore.getState();
+    const sameModule = state.config?.pageKey === config.pageKey;
+
+    // Don't interrupt an already-open overlay / tour for THIS module
+    if (sameModule) {
+      if (
+        state.phase === "active" ||
+        state.phase === "summary" ||
+        state.phase === "quiz" ||
+        state.phase === "mode-picker" ||
+        state.phase === "scenario-picker"
+      ) {
+        return;
+      }
+    }
+
+    // Path picker stays until user picks (may be on hub page)
+    if (state.phase === "path-picker" && choosePath) return;
 
     useCheckpointStore.getState().clear();
 
@@ -190,9 +215,6 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
       }, 180);
       return () => window.clearTimeout(t);
     }
-
-    const config = getTourByPathname(pathname);
-    if (!config) return;
 
     const t = window.setTimeout(() => {
       useTrainingStore.getState().openModePicker(config);

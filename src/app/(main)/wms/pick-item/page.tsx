@@ -1,33 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { Fragment } from "react";
 import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { PickItemTour } from "@/features/wms/b2c/picking/tour-config";
-import { useTrainingStore } from "@/features/learning/stores/training-store";
-import { useTraining } from "@/features/learning/hooks/use-training";
+import { withStartTour } from "@/shared/lib/tour-registry";
 
 export default function PickItemPage() {
   const { startTraining } = useTrainingContext();
-  const { beginTour } = useTraining();
-
-  useEffect(() => {
-    const raw = sessionStorage.getItem("wmsB2cPickResume");
-    if (raw) {
-      try {
-        const meta = JSON.parse(raw);
-        sessionStorage.removeItem("wmsB2cPickResume");
-        if (meta?.resume) {
-          const store = useTrainingStore.getState();
-          store.setMode(meta.mode || "practice");
-          store.selectScenario(meta.scenario || PickItemTour.scenarios[0]);
-          store.beginTour();
-          setTimeout(() => beginTour(0), 100);
-        }
-      } catch {}
-    }
-  }, [beginTour]);
 
   return (
     <>
@@ -35,7 +16,6 @@ export default function PickItemPage() {
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Piece Pick Item" }]} />
       <div className="product-page-body p-5">
         <div className="max-w-[480px]">
-          {/* Express toggle */}
           <div className="flex items-center gap-2.5 mb-4 text-xs text-slate-700 cursor-pointer select-none">
             <label className="relative inline-flex items-center cursor-pointer">
               <input id="ppi-express-toggle" type="checkbox" className="sr-only peer" />
@@ -59,10 +39,10 @@ export default function PickItemPage() {
                 { label: "Client SKU ID", value: "—" },
                 { label: "Order Type", value: "—" },
               ].map((attr) => (
-                <>
+                <Fragment key={attr.label}>
                   <dt className="text-xs text-slate-400 font-medium border-b border-slate-100 py-1.5">{attr.label}</dt>
                   <dd className="text-xs text-slate-700 font-semibold border-b border-slate-100 py-1.5 m-0">{attr.value}</dd>
-                </>
+                </Fragment>
               ))}
             </div>
             <div className="flex flex-col gap-1">
@@ -72,7 +52,7 @@ export default function PickItemPage() {
             <div id="ppi-actions" className="flex gap-2 mt-2">
               <button id="ppi-btn-pick" className="h-8 px-4 rounded bg-green-600 text-white text-xs font-semibold hover:bg-green-700">Confirm Pick</button>
               <button className="h-8 px-4 rounded border border-red-400 bg-white text-red-500 text-xs font-semibold hover:bg-red-50">Not Found</button>
-              <a href="/wms/packing" className="btn btn-blue ml-auto">Next: Packing</a>
+              <a href={withStartTour("/wms/packing")} className="btn btn-blue ml-auto">Next: Packing</a>
             </div>
           </div>
         </div>

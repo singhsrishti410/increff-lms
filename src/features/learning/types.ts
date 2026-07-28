@@ -25,6 +25,8 @@ export interface TourStep {
   commonMistakes?: string;
   hint?: string;
   validationMessage?: string;
+  /** If set, step only runs for these scenario ids. Omit = all scenarios. */
+  scenarioIds?: string[];
 }
 
 export interface Scenario {

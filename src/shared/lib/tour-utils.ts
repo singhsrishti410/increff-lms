@@ -1,4 +1,10 @@
-import type { ExpectedValue } from "@/features/learning/types";
+import type { ExpectedValue, TourConfig, TourStep } from "@/features/learning/types";
+
+/** Steps that apply to the selected scenario (or all steps if no scenario). */
+export function activeTourSteps(config: TourConfig, scenarioId?: string | null): TourStep[] {
+  if (!scenarioId) return config.steps;
+  return config.steps.filter((s) => !s.scenarioIds?.length || s.scenarioIds.includes(scenarioId));
+}
 
 export function fillInput(selector: string, value: string) {
   const el = document.querySelector<HTMLInputElement>(selector);

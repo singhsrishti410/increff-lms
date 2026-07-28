@@ -4,6 +4,7 @@ import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { ReceiveBoxesTour } from "@/features/wms/inward/receive-boxes/tour-config";
+import { withStartTour } from "@/shared/lib/tour-registry";
 
 export default function ReceiveBoxesPage() {
   const { startTraining } = useTrainingContext();
@@ -62,7 +63,7 @@ export default function ReceiveBoxesPage() {
             {/* Confirm */}
             <div>
               <button id="receive-btn-confirm" className="h-8 px-4 rounded bg-green-600 text-white text-xs font-semibold hover:bg-green-700">Confirm All Received</button>
-              <a href="/wms/grn" className="btn btn-blue ml-2">Next: GRN</a>
+                <a href={withStartTour("/wms/grn")} className="btn btn-blue ml-2">Next: GRN</a>
             </div>
           </div>
         </div>

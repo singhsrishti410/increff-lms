@@ -1,40 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
 import { useTrainingContext } from "@/providers/training-provider";
 import { AppHeader } from "@/shared/components/app-header";
 import { Breadcrumb } from "@/shared/components/breadcrumb";
 import { WmsFormTour } from "@/features/wms/inward/gate-entry/tour-config";
-import { useCheckpointStore } from "@/shared/stores/checkpoint-store";
 import { showToast, openModal, closeModal } from "@/shared/lib/tour-utils";
 
 export default function NewGateEntryPage() {
-  const { startTraining, startWithScenario } = useTrainingContext();
-
-  // Resume full Gate Entry demo after list → Add New Entry
-  useEffect(() => {
-    const raw = sessionStorage.getItem("wmsTrainingResume");
-    if (!raw) return;
-    try {
-      const meta = JSON.parse(raw);
-      sessionStorage.removeItem("wmsTrainingResume");
-      if (!meta?.resume) return;
-      useCheckpointStore.getState().clear();
-      const scenario =
-        meta.scenario ||
-        WmsFormTour.scenarios[0] || {
-          id: "acme-truck",
-          title: "Continue",
-          story: "Select the PO and fill the gate entry form.",
-        };
-      const config = {
-        ...WmsFormTour,
-        mode: (meta.mode as "watch" | "practice") || "watch",
-        resume: true,
-      };
-      setTimeout(() => startWithScenario(config, scenario, 0), 300);
-    } catch {}
-  }, [startWithScenario]);
+  const { startTraining } = useTrainingContext();
 
   return (
     <>
